@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Open Web App Boilerplate</title>
+    <link rel="stylesheet" type="text/css" href="css/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="css/boilerplate.less" />
+    <link rel="stylesheet" type="text/css" href="css/style.less" />
+    <!--[if IE]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+
+  <body id="home">
+    <h1>Open Web App Boilerplate</h1>
+
+    <script src="https://myapps.mozillalabs.com/jsapi/include.js"></script>
+    <script src="js/lib/jquery.js"></script>
+
+    <script>
+      /* Settings */
+      var require_install = true; // Should users be allowed to use the app without installing it?
+
+      /* Advanced settings */
+      var path = getRootPath(),
+          path_to_manifest = path + "manifest.webapp"; // Replace getRootPath() with an actual URL
+
+      /* Code! */
+      function getRootPath() {
+          var url = window.location.href.split('/'),
+              last = url[url.length - 1];
+
+          if(last.indexOf('.') >= 0) {
+            delete url[url.length - 1];
+          }
+
+          var path = url.join('/');
+
+          if(path[path.length - 1] != "/") {
+            path += "/";
+          }
+
+          return path;
+      }
+
+      try {
+          function onerror() {
+              if(require_install) {
+                    var error = $('<div>', {'id': 'installapp'}),
+                        $button = $('<button>', {'text': 'Install'});
+
+                    error.append($('<h1>', {'text': 'You need to install this app.'}));
+                    error.append($button);
+                    $('body').append(error);
+
+                    $button.click(function() {
+                      var request = navigator.mozApps.install(path_to_manifest);
+                      request.onsuccess = function() {
+                        alert('worked!');
+                        // great - display a message, or redirect to a launch page
+                      }
+                      request.onerror = function() {
+                        // whoops - this.error.name has details
+                        alert('error!' + this.error.name);
+                      }
+                    });
+              } else {
+                onsuccess();
+              }
+          }
+          function onsuccess() {
+              alert('Works!');
+          }
+
+          var request = navigator.mozApps.getSelf();
+          request.onsuccess = function() {
+              if (request.result) {
+                  onsuccess();
+              } else {
+                  onerror();
+              }
+          }
+          request.onerror = function() {
+              onerror();
+              //alert('Error checking installation status: ' + this.error.message);
+          }
+      } catch(e) {
+          onerror();
+          //alert('Error checking installation status');
+      }
+    </script>
+
+    <script src="js/script.js"></script>
+
+    <script src="js/lib/less_setup.js"></script>
+    <script src="js/lib/less.js"></script>
+  </body>
+</html>
